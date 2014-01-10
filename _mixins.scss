@@ -1,0 +1,144 @@
+//Golden ratio hierachy
+$ratio-zero: 0.236;
+$ratio-one: 0.382;
+$ratio-two: 0.618;
+$ratio-three: 1;
+$ratio-four: 1.618;
+$ratio-five: 2.618;
+$ratio-six: 4.236;
+$ratio-seven: 6.854;
+$ratio-eight: 11.089;
+$ratio-nine: 17.942;
+$ratio-ten: 29.03;
+
+// PROPERTIES MIXIN - Provide between 1 and 4 values for a given property
+//   Defaults to rems, falls back to px for IE using $font-size-default-px as baseline
+//   Supports "0" and "auto" as values, and mixed values, e.g. "1rem auto 5px auto"
+//   http://designbyjoel.com/blog/2013-02-28-sass-rems/
+
+@function fix8_unit_to_px($val) {
+  @if $val == auto {
+    @return $val;
+  }
+  @else {
+    @if unitless($val) {
+      @if $val == 0 { @return $val }
+      @else { @return $val * $font-size-default-px};
+    } @else { @return $val};
+  }
+}
+
+@function fix8_unit_to_rem($val) {
+  @if $val == auto {
+    @return $val;
+  }
+  @else {
+    @if unitless($val) {
+      @if $val == 0 { @return $val }
+      @else { @return $val+rem};
+    } @else { @return $val};
+  }
+}
+
+@mixin property($prop, $val...) {
+  $n: length($val);
+  $i: 1;
+
+  $px-list: ();
+  $rem-list: ();
+
+  @while $i <= $n {
+    $px-list: append($px-list, fix8_unit_to_px(nth($val, $i)));
+    $rem-list: append($rem-list, fix8_unit_to_rem(nth($val, $i)));
+    $i: $i + 1;
+  }
+
+  #{$prop}: $px-list;
+  #{$prop}: $rem-list;
+}
+
+// Font picker
+@function rem-to-px($rem-value){
+	@return $rem-value * $font-size-default-px;
+}
+
+@mixin font($font-size, $line-height, $font-family) {
+  font: normal #{rem-to-px($font-size)}/#{$line-height} $font-family;  
+  font-size: $font-size + rem;
+}
+
+@mixin border($border-type, $border-width, $border-style, $border-color) {
+  #{$border-type}: rem-to-px($border-width) $border-style $border-color;  
+  #{$border-type}-width: $border-width + rem;
+}
+
+//Cross browser mixins
+
+//Add vendor prefixes to value, e.g. for position sticky – cross browser mixin
+//@mixin value-prefix($value-prefix-property,$value-prefix-value){
+//    #{$value-prefix-property}: -webkit-$value-prefix-value;
+//position: -moz-sticky;
+//position: -ms-sticky;
+//position: -o-sticky;
+//position: sticky;
+//}
+
+@mixin position-sticky(){
+    position: -webkit-sticky;
+    position: -moz-sticky;
+    position: -ms-sticky;
+    position: -o-sticky;
+    position: sticky;
+}
+
+//Background size – cross browser mixin
+@mixin background-size($background-size-width, $background-size-height){
+	-moz-background-size:$background-size-width $background-size-height;
+	-webkit-background-size:$background-size-width $background-size-height;
+	background-size:$background-size-width $background-size-height;	
+}
+
+//Border radius – cross browser mixin
+@mixin border-radius($border-radius-value){
+	-moz-border-radius:rem-to-px($border-radius-value) !important;
+	-webkit-border-radius:rem-to-px($border-radius-value) !important;
+	border-radius:rem-to-px($border-radius-value) !important;	
+	-moz-border-radius:$border-radius-value + rem !important;
+	-webkit-border-radius:$border-radius-value  + rem !important;
+	border-radius:$border-radius-value + rem !important;
+}
+
+//Transform - Scale - cross browser mixin
+@mixin transform-scale($scale-horizontal, $scale-vertical) {
+	transform : scale($scale-horizontal,$scale-vertical);
+	-webkit-transform:scale($scale-horizontal,$scale-vertical); /* Safari and Chrome */
+	-moz-transform:scale($scale-horizontal,$scale-vertical); /* Firefox */
+	-ms-transform:scale($scale-horizontal,$scale-vertical); /* IE 9+ */
+	-o-transform:scale($scale-horizontal,$scale-vertical); /* Opera */
+}
+
+//Opacity – cross browser mixin
+@mixin opacity($opacity) {
+	zoom: 1;
+	filter: alpha(opacity=$opacity*100);
+	opacity: $opacity;
+}
+
+//Transitions
+@mixin transition($transition-property, $transition-time, $method) {
+    -webkit-transition: $transition-property $transition-time $method;
+    -moz-transition: $transition-property $transition-time $method;
+    -ms-transition: $transition-property $transition-time $method;
+    -o-transition: $transition-property $transition-time $method;
+    transition: $transition-property $transition-time $method;
+}
+
+//Animations – cross browser mixin
+//Use BOURBON for cross browser keyframes
+@mixin css-animation($animation-name, $animation-duration, $animation-delay, $animation-iteration-count, $animation-timing-function, $animation-fill-mode) {
+	-webkit-animation: $animation-name $animation-duration $animation-delay $animation-iteration-count $animation-timing-function $animation-fill-mode;
+	-moz-animation: $animation-name $animation-duration $animation-delay $animation-iteration-count $animation-timing-function $animation-fill-mode;
+	-ms-animation: $animation-name $animation-duration $animation-delay $animation-iteration-count $animation-timing-function $animation-fill-mode;
+	-o-animation: $animation-name $animation-duration $animation-delay $animation-iteration-count $animation-timing-function $animation-fill-mode;
+	animation: $animation-name $animation-duration $animation-delay $animation-iteration-count $animation-timing-function $animation-fill-mode;	
+}
